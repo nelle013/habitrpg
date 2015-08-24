@@ -103,10 +103,16 @@ if (cores!==0 && cluster.isMaster && (isDev || isProd)) {
   app.use(redirects.forceSSL);
 
   var bodyParser = require('body-parser');
+  // Default limit is 100kb, need that because we actually send whole groups to the server
+  // FIXME as soon as possible (need to move on the client from $resource -> $http)    
   app.use(bodyParser.urlencoded({
+    limit: '1mb',
+    parameterLimit: 10000, // Upped for safety from 1k, FIXME as above
     extended: true // Uses 'qs' library as old connect middleware
   }));
-  app.use(bodyParser.json());
+  app.use(bodyParser.json({
+    limit: '1mb'
+  }));
 
   app.use(require('method-override')());
   //app.use(express.cookieParser(nconf.get('SESSION_SECRET')));
